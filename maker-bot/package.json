@@ -1,0 +1,20 @@
+{
+  "scripts": {
+    "start": "ts-node src/main.ts",
+    "transfer": "ts-node src/transfer-btc.ts"
+  },
+  "dependencies": {
+    "@types/bitcoinjs-lib": "^5.0.4",
+    "axios": "^1.7.8",
+    "bip32": "^5.0.0-rc.0",
+    "bitcoinjs-lib": "^7.0.0-rc.0",
+    "ecpair": "^3.0.0-rc.0",
+    "tiny-secp256k1": "^2.2.3"
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e",
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}
