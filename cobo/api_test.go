@@ -16,7 +16,9 @@ func TestCoboApi(t *testing.T) {
 	assetWallet1 := "1ca73052-3133-42bd-99b9-90744b85d07f"
 	t.Run("ListSupportedChains", func(t *testing.T) {
 		chains, _ := client.ListSupportedChains()
-		fmt.Println(chains)
+		for _, chain := range chains.Data {
+			fmt.Println(chain.ChainId, *chain.Symbol)
+		}
 		assert.NotEmptyf(t, chains, "ListSupportedChains should return a non-empty response")
 	})
 	t.Run("ListAllTransactions", func(t *testing.T) {
@@ -96,6 +98,13 @@ func TestCoboApi(t *testing.T) {
 		resp, err := client.GetMaxTransferableValue(assetWallet1, "XTN", "0", fromAddr, toAddr)
 		fmt.Println(resp.GetTokenId())
 		fmt.Println(resp.GetMaxTransferableValue())
+		assert.NoError(t, err)
+	})
+	t.Run("Estimate transfer fee", func(t *testing.T) {
+		amount := "0.00001"
+		toAddr := "tb1parg0pkcnv5d6ha0kqk4ljct2jrhjzmxrq6gcsnsdjpfymj4lcf6sjk37mf"
+		resp, err := client.EstimateTxFee(assetWallet1, "XTN", amount, toAddr)
+		fmt.Println(resp.EstimatedFixedFee.FeeAmount)
 		assert.NoError(t, err)
 	})
 }

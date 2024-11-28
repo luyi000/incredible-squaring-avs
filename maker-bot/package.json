@@ -1,7 +1,11 @@
 {
   "scripts": {
     "start": "ts-node src/main.ts",
-    "transfer": "ts-node src/transfer-btc.ts"
+    "transfer": "ts-node src/transfer-btc.ts",
+    "transfer-4": "ts-node src/transfer-btc-4.ts",
+    "gen-addr-3": "ts-node src/gen-addr-3.ts",
+    "gen-addr-4": "ts-node src/gen-addr-4.ts",
+    "decode-memo": "ts-node src/decode-memo.ts"
   },
   "dependencies": {
     "@types/bitcoinjs-lib": "^5.0.4",

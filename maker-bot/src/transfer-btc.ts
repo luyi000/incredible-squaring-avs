@@ -59,6 +59,12 @@ const {address: sendAddress} = bitcoin.payments.p2tr({
 
 console.log({sendAddress});
 
+async function getCurrentFeeRate() {
+    // Fetch current fee rate from a service
+    const response = await axios.get('https://api.blockcypher.com/v1/btc/test3');
+    return response.data.medium_fee_per_kb; // Fee in satoshis per kilobyte
+}
+
 
 function toXOnly(publicKey) {
     // Ensure the public key is in Buffer format
@@ -89,9 +95,23 @@ async function createAndSignTransaction() {
         throw new Error('No UTXOs available');
     }
 
-    console.log({utxos});
 
+    // Extract the transaction
+    const currentFeeRate = await getCurrentFeeRate();
+    const feeRate = Math.floor(currentFeeRate * 1.2);
+    const estimatedByteLength = 200;
+    const fee = Math.ceil((feeRate / 1000) * estimatedByteLength);
+
+    console.log({utxos});
     const utxo = utxos[0];
+    const satosh = 100000000;
+    const amountToSend = utxo.value - fee;
+    console.log({
+        amountToSend: amountToSend / satosh,
+        fee: fee / satosh,
+        utxoValue: utxo.value / satosh,
+        satVb: feeRate / 1000
+    });
     const psbt = new Psbt({network}).addInput({
         hash: utxo.tx_hash, // Transaction ID of the UTXO
         index: utxo.tx_output_n, // Output index of the UTXO
@@ -106,9 +126,9 @@ async function createAndSignTransaction() {
         tapInternalKey: sendPubKey
     }).signInput(0, tweakedChildNode).finalizeAllInputs();
 
-    // Extract the transaction
-    const tx = psbt.extractTransaction(); // Returns the transaction in hex format
+
     // Broadcast the transaction
+    const tx = psbt.extractTransaction(); // Returns the transaction in hex format
     const broadcastResponse = await broadcastTransaction(tx.toHex());
     console.log('Broadcast Response:', broadcastResponse);
     console.log('Tx Hash:', broadcastResponse.tx.hash);

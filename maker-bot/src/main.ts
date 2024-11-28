@@ -95,8 +95,8 @@ async function sendBTCWithMemo(
 
         // Add output for recipient
         const satoshis = Math.floor(amountInBTC * 100000000);
-        const data = Buffer.from(memo, 'utf8');
-        const embed = bitcoin.payments.embed({data: [data]});
+        const memoBuffer = Buffer.from(memo, 'utf8');
+        const embed = bitcoin.payments.embed({data: [memoBuffer]});
         psbt.addOutput({
             script: embed.output!,
             address: sendAddress,

@@ -99,7 +99,7 @@ func (c Cobo) TransferOutFromCustodial(walletId string, tokenId string, amount s
 		RequestId: uuid.New().String(),
 		Source: coboWaas2.TransferSource{
 			CustodialTransferSource: &coboWaas2.CustodialTransferSource{
-				SourceType: coboWaas2.WALLETSUBTYPE_ASSET,
+				SourceType: "ASSET",
 				WalletId:   walletId,
 			},
 		},
@@ -165,6 +165,39 @@ func (c Cobo) GetMaxTransferableValue(walletId string, tokenId string, feeRate s
 	resp, _, err := req.Execute()
 	if err != nil {
 		c.logger.Error("Error when calling `WalletsAPI.GetMaxTransferableValue`", zap.Error(err))
+		return nil, err
+	}
+	return resp, nil
+}
+
+func (c Cobo) EstimateTxFee(walletId string, tokenId string, amount string, toAddr string) (*coboWaas2.EstimatedFee, error) {
+	ctx := c.initContext()
+	feeType := coboWaas2.FEETYPE_UTXO
+	req := c.apiClient.TransactionsAPI.EstimateFee(ctx).EstimateFeeParams(coboWaas2.EstimateFeeParams{
+		EstimateTransferFeeParams: &coboWaas2.EstimateTransferFeeParams{
+			RequestType: coboWaas2.ESTIMATEFEEREQUESTTYPE_TRANSFER,
+			Source: coboWaas2.TransferSource{
+				CustodialTransferSource: &coboWaas2.CustodialTransferSource{
+					SourceType: coboWaas2.WALLETSUBTYPE_ASSET,
+					WalletId:   walletId,
+				},
+			},
+			Destination: &coboWaas2.TransferDestination{
+				AddressTransferDestination: &coboWaas2.AddressTransferDestination{
+					DestinationType: coboWaas2.TRANSFERDESTINATIONTYPE_ADDRESS,
+					AccountOutput: &coboWaas2.AddressTransferDestinationAccountOutput{
+						Amount:  amount,
+						Address: toAddr,
+					},
+				},
+			},
+			TokenId: tokenId,
+			FeeType: &feeType,
+		},
+	})
+	resp, _, err := req.Execute()
+	if err != nil {
+		c.logger.Error("Error when calling `WalletsAPI.EstimateFee`", zap.Error(err))
 		return nil, err
 	}
 	return resp, nil
